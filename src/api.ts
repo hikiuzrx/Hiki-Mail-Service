@@ -113,3 +113,4 @@ api.get('/',(req:Request,res:Response)=>{
      console.log('request came')
      res.status(201).json({message:'email sent'})
 })
+export default api
