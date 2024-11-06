@@ -23,7 +23,11 @@ let api = (0, express_1.default)();
 mongoose_1.default.connect(process.env.CONNECTION_STRING, { dbName: 'ALCOEN' }).then(() => console.log('connected to db'));
 api.listen(process.env.PORT, () => console.log('currently listening at port ' + process.env.PORT));
 api.use(express_1.default.json());
-api.use((0, cors_1.default)());
+api.use((0, cors_1.default)({
+    origin: process.env.FRONTEND_URL, // Set this to your frontend URL
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 function isValidEmail(email) {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(email);

@@ -10,7 +10,11 @@ let api:Express = express()
 mongoose.connect(process.env.CONNECTION_STRING as string,{dbName:'ALCOEN'}).then(()=> console.log('connected to db'))
 api.listen(process.env.PORT,()=> console.log('currently listening at port '+ process.env.PORT))
 api.use(express.json())
-api.use(cors())
+api.use(cors({
+     origin: process.env.FRONTEND_URL, // Set this to your frontend URL
+     methods: ['GET', 'POST'],
+     allowedHeaders: ['Content-Type', 'Authorization']
+}))
 function isValidEmail(email:string):boolean {
      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
      return re.test(email);
