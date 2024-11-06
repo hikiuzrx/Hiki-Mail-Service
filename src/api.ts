@@ -12,8 +12,9 @@ api.listen(process.env.PORT,()=> console.log('currently listening at port '+ pro
 api.use(express.json())
 api.use(cors({
      origin: process.env.FRONTEND_URL, // Set this to your frontend URL
-     methods: ['GET', 'POST'],
-     allowedHeaders: ['Content-Type', 'Authorization']
+     methods: ['GET', 'POST','OPTIONS'],
+     allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
 }))
 function isValidEmail(email:string):boolean {
      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
