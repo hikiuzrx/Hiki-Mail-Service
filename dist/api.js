@@ -40,88 +40,83 @@ api.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         if (isValidEmail(emailData.email)) {
             if (isValidPhoneNumber(emailData.phoneNumber)) {
                 let user = yield db_1.default.findOne({ email: emailData.email });
-                user ? console.log('user already saved') : db_1.default.create({
-                    fullName: `${emailData.lastName} ${emailData.firstName}`,
-                    email: emailData.email,
-                    company: emailData.companyName,
-                    phoneNumber: emailData.phoneNumber,
-                    updateUser: emailData.uClient,
-                    sentCopy: emailData.sCopy
-                });
-                console.log(process.env.PASS);
+                if (!user) {
+                    yield db_1.default.create({
+                        fullName: `${emailData.lastName} ${emailData.firstName}`,
+                        email: emailData.email,
+                        company: emailData.companyName,
+                        phoneNumber: emailData.phoneNumber,
+                        updateUser: emailData.uClient,
+                        sentCopy: emailData.sCopy
+                    });
+                }
                 let transporter = nodemailer_1.default.createTransport({
                     host: 'mail.alcoen.net',
-                    port: 465, // or 465 for SSL
+                    port: 465,
                     secure: true,
                     auth: {
                         user: process.env.MEMAIL,
                         pass: process.env.PASS
                     },
                 });
-                console.log('we are here');
-                console.log(emailData.message);
                 let mailOptions = {
                     from: process.env.MEMAIL,
                     to: process.env.DEMAIL,
                     subject: 'business interest',
                     html: `
                          <h3>Mr/Mrs ${emailData.firstName} ${emailData.lastName} from ${emailData.companyName} shows interest in working together</h3>
-                         <p>Mr/Mrs left ALCOEN their contact informations along with a message experssig their interest in a potenial business deal between the two companies, starting with their message </p>
+                         <p>Mr/Mrs left ALCOEN their contact informations along with a message expressing their interest in a potential business deal between the two companies.</p>
                          <p>${emailData.message}</p>
-                         <h4>Contact informations :</h4>
+                         <h4>Contact informations:</h4>
                          <ul>
-                              <li> ${emailData.email}</li>
-                              <li> ${emailData.phoneNumber}</li>
+                              <li>Email: ${emailData.email}</li>
+                              <li>Phone: ${emailData.phoneNumber}</li>
                          </ul>
                          `
                 };
-                console.log('Email message:', mailOptions);
                 try {
                     let emailSent = yield transporter.sendMail(mailOptions);
+                    console.log('email sent');
                     if (emailSent.accepted.length > 0) {
                         if (emailData.sCopy) {
+                            // Send a copy to the sender if requested
                             mailOptions.to = emailData.email;
                             mailOptions.subject = 'Thank you for contacting Alcoen';
                             mailOptions.html = `
-                                        <p> this is a copy of the message you sent to Alcoen, Alcoen's team will reach out to you as soon as possible in the mean time thanks for contacting ALCOEN</p>
-                                        <h3>Mr/Mrs ${emailData.firstName} ${emailData.lastName} from ${emailData.companyName} shows interest in working together</h3>
-                                        <p>Mr/Mrs left ALCOEN their contact informations along with a message experssig their interest in a potenial business deal between the two companies, starting with their message </p>
+                                        <p>This is a copy of the message you sent to Alcoen. Alcoen's team will reach out to you as soon as possible. Thank you for contacting ALCOEN.</p>
+                                        <h3>Message details:</h3>
                                         <p>${emailData.message}</p>
-                                        <h4>Contact informations :</h4>
+                                        <h4>Contact informations:</h4>
                                         <ul>
-                                             <li> ${emailData.email}</li>
-                                             <li> ${emailData.phoneNumber}</li>
+                                             <li>Email: ${emailData.email}</li>
+                                             <li>Phone: ${emailData.phoneNumber}</li>
                                         </ul>
-                                        <p> A copy of this message will be sent Mr/Mrs ${emailData.lastName}</p>`;
-                            let copySent = yield transporter.sendMail(mailOptions);
-                            if (copySent.accepted.length > 0) {
-                                res.status(200).json({ message: 'email sent ' });
-                            }
-                            else {
-                                throw new Error('error sending the copy Email');
-                            }
+                                   `;
+                            yield transporter.sendMail(mailOptions);
                         }
-                        res.status(200).json({ message: 'email sent ' });
+                        // Send response only once, after both emails are successfully sent
+                        return res.status(200).json({ message: 'email sent' });
                     }
                     else {
                         throw new Error('Error: email was not sent');
                     }
                 }
                 catch (error) {
-                    console.error('error sending mail: ' + error);
-                    res.status(401).json({ message: `failed request at: ${error}` });
+                    console.error('error sending mail:', error);
+                    return res.status(500).json({ message: `failed request at: ${error.message}` });
                 }
             }
             else {
-                res.status(401).json({ message: 'unvalid phone number' });
+                return res.status(400).json({ message: 'invalid phone number' });
             }
         }
         else {
-            res.status(401).json({ message: 'unvalid email' });
+            return res.status(400).json({ message: 'invalid email' });
         }
     }
 }));
 api.get('/', (req, res) => {
     console.log('request came');
-    res.status(201).json({ message: 'email sent' });
+    res.status(201).json({ message: 'wroking' });
 });
+exports.default = api;

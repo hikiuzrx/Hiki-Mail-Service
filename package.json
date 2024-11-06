@@ -8,8 +8,7 @@
     "prestart": "npm run build",
     "start": "node dist/api.js",
     "preserve": "npm run build",
-    "serve": "concurrently \"tsc -w \" \"nodemon dist/api.js\" ",
-    "vercel-builld" :"echo work"
+   "serve": "concurrently \"tsc -w\" \"nodemon dist/api.js\""
   },
   "keywords": [],
   "author": "",
