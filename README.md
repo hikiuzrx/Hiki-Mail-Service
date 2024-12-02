@@ -1,2 +1,2 @@
 # Hiki-Mail-Service
-this is my own email service 
+It's Mail service developped using Node Express Typescript and node mailer 
